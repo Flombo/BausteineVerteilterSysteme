@@ -1,0 +1,30 @@
+[debug] > Exec(run "E:Projekte/aufgabe1", None, None)
+[debug] Evaluating tasks: Compile / run
+[debug] Running task... Cancel: Signal, check cycles: false, forcegc: true
+[info] compiling 10 Scala sources to E:\Projekte\BausteineVerteilterSysteme\target\scala-2.13\classes ...
+[warn] E:\Projekte\BausteineVerteilterSysteme\src\main\scala\DBWriterActor.scala:31:12: This catches all Throwables. If this is really intended, use `case e : Throwable` to clear this warning.
+[warn]       case e => e.printStackTrace()
+[warn]            ^
+[warn] E:\Projekte\BausteineVerteilterSysteme\src\main\scala\DBWriterActor.scala:48:12: This catches all Throwables. If this is really intended, use `case e : Throwable` to clear this warning.
+[warn]       case e => e.printStackTrace()
+[warn]            ^
+[warn] E:\Projekte\BausteineVerteilterSysteme\src\main\scala\MeasurementAverageActor.scala:27:12: This catches all Throwables. If this is really intended, use `case e : Throwable` to clear this warning.
+[warn]       case e => e.printStackTrace()
+[warn]            ^
+[warn] E:\Projekte\BausteineVerteilterSysteme\src\main\scala\CSVFileActor.scala:14:7: method with a single empty parameter list overrides method without any parameter list
+[warn]   def receive(): Receive = {
+[warn]       ^
+[warn] E:\Projekte\BausteineVerteilterSysteme\src\main\scala\CSVTextActor.scala:17:7: method with a single empty parameter list overrides method without any parameter list
+[warn]   def receive(): Receive = {
+[warn]       ^
+[warn] E:\Projekte\BausteineVerteilterSysteme\src\main\scala\DBWriterActor.scala:58:7: method with a single empty parameter list overrides method without any parameter list
+[warn]   def receive(): Receive = {
+[warn]       ^
+[warn] E:\Projekte\BausteineVerteilterSysteme\src\main\scala\MeasurementAverageActor.scala:101:7: method with a single empty parameter list overrides method without any parameter list
+[warn]   def receive(): Receive = {
+[warn]       ^
+[warn] 3 deprecations (since 2.13.0)
+[warn] 1 deprecation (since 2.13.3)
+[warn] 4 deprecations in total; re-run with -deprecation for details
+[warn] 10 warnings found
+[info] done compiling
