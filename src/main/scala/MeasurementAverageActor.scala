@@ -9,23 +9,28 @@ class MeasurementAverageActor(dbWriterActor : ActorRef) extends Actor{
   val url : String = "jdbc:h2:tcp://localhost/~/test"
   val username : String = "sa"
   val password : String = ""
-  var connection : Connection = null
 
+  /**
+   * preStart function will be executed before the Actor will be started.
+   * builds db tables jena and jenameasurements if the don't already exist.
+   */
   override def preStart(): Unit = {
     super.preStart()
     createDBTables()
   }
 
   /**
-   * opens connection and saves it to connection variable for further usage
+   * opens connection and returns it for further usage
    */
-  def connectToH2() {
+  def connectToH2(): Connection = {
+    var connection: Connection = null
     try {
       Class.forName(driver)
       connection = DriverManager.getConnection(url, username, password)
     } catch {
       case e => e.printStackTrace()
     }
+    connection
   }
 
   /**
@@ -35,23 +40,25 @@ class MeasurementAverageActor(dbWriterActor : ActorRef) extends Actor{
    * @return
    */
   def readMeasurementsFromDBAndBuildAverage(timestamp: Timestamp) : Float = {
-    connectToH2()
-    val prepareStatement = connection.prepareStatement("SELECT AVG(DEGC) as DEGCAVG from JENAMEASUREMENTS where MESSAGETIMESTAMP >= ? AND MESSAGETIMESTAMP <= ?;")
+    val connection : Connection = connectToH2()
+    var degcavg : Float = 0
+    if(connection != null) {
+      val prepareStatement = connection.prepareStatement("SELECT AVG(DEGC) as DEGCAVG from JENAMEASUREMENTS where MESSAGETIMESTAMP >= ? AND MESSAGETIMESTAMP <= ?;")
 
-    //builds the timestamp for yesterday from given timestamp
-    val yesterday = Timestamp.valueOf(timestamp.toLocalDateTime.minusHours(24))
+      //builds the timestamp for yesterday from given timestamp
+      val yesterday = Timestamp.valueOf(timestamp.toLocalDateTime.minusHours(24))
 
-    prepareStatement.setString(1, yesterday.toString)
-    prepareStatement.setString(2, timestamp.toString)
-    val resultSet = prepareStatement.executeQuery()
-    resultSet.next()
+      prepareStatement.setString(1, yesterday.toString)
+      prepareStatement.setString(2, timestamp.toString)
+      val resultSet = prepareStatement.executeQuery()
+      resultSet.next()
 
-    val degcavg: Float = resultSet.getFloat("DEGCAVG")
+      degcavg = resultSet.getFloat("DEGCAVG")
 
-    resultSet.close()
-    prepareStatement.close()
-    this.connection.close()
-
+      resultSet.close()
+      prepareStatement.close()
+      connection.close()
+    }
     degcavg
   }
 
@@ -62,7 +69,7 @@ class MeasurementAverageActor(dbWriterActor : ActorRef) extends Actor{
    * @param degC : Float
    */
   def writeMeasurementIntoMeasurementTable(timestamp: Timestamp, degC : Float): Unit = {
-    connectToH2()
+    val connection : Connection = connectToH2()
     val prepareStatement = connection.prepareStatement("INSERT INTO JENAMEASUREMENTS(MESSAGETIMESTAMP , DEGC) values (? ,? );")
 
     prepareStatement.setTimestamp(1, timestamp)
@@ -70,14 +77,14 @@ class MeasurementAverageActor(dbWriterActor : ActorRef) extends Actor{
 
     prepareStatement.execute()
     prepareStatement.close()
-    this.connection.close()
+    connection.close()
   }
 
   /**
    * creates tables 'jena' and 'jenameasurments' if they don't already exist.
    */
   def createDBTables(): Unit = {
-    connectToH2()
+    val connection : Connection = connectToH2()
 
     var prepareStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS jena(id bigint not null auto_increment primary key, messagetimestamp timestamp not null, degcavg float not null);")
     prepareStatement.execute()

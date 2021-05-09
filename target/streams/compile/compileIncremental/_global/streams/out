@@ -2,5 +2,46 @@
 [debug] IncrementalCompile.incrementalCompile
 [debug] previous = Stamps for: 20 products, 10 sources, 2 libraries
 [debug] current source = Set(${BASE}/src/main/scala/caseClasses/CancelMessage.scala, ${BASE}/src/main/scala/CSVFileActor.scala, ${BASE}/src/main/scala/caseClasses/CSVFileMessage.scala, ${BASE}/src/main/scala/DBWriterActor.scala, ${BASE}/src/main/scala/caseClasses/AverageMeasurementValueMessage.scala, ${BASE}/src/main/scala/MeasurementAverageActor.scala, ${BASE}/src/main/scala/Main.scala, ${BASE}/src/main/scala/caseClasses/MeasurementValueMessage.scala, ${BASE}/src/main/scala/CSVTextActor.scala, ${BASE}/src/main/scala/caseClasses/CSVTextMessage.scala)
-[debug] > initialChanges = InitialChanges(Changes(added = Set(), removed = Set(), changed = Set(), unmodified = ...),Set(),Set(),API Changes: Set())
-[debug] No changes
+[debug] > initialChanges = InitialChanges(Changes(added = Set(), removed = Set(), changed = Set(${BASE}/src/main/scala/Main.scala), unmodified = ...),Set(${BASE}/target/scala-2.13/classes/Main$.class),Set(),API Changes: Set())
+[debug] 
+[debug] Initial source changes:
+[debug] 	removed: Set()
+[debug] 	added: Set()
+[debug] 	modified: Set(${BASE}/src/main/scala/Main.scala)
+[debug] Invalidated products: Set(${BASE}/target/scala-2.13/classes/Main$.class)
+[debug] External API changes: API Changes: Set()
+[debug] Modified binary dependencies: Set()
+[debug] Initial directly invalidated classes: Set(Main)
+[debug] Sources indirectly invalidated by:
+[debug] 	product: Set(${BASE}/src/main/scala/Main.scala)
+[debug] 	binary dep: Set()
+[debug] 	external source: Set()
+[debug] All initially invalidated classes: Set(Main)
+[debug] All initially invalidated sources:Set(${BASE}/src/main/scala/Main.scala)
+[debug] Initial set of included nodes: Main
+[debug] compilation cycle 1
+[info] compiling 1 Scala source to E:\Projekte\BausteineVerteilterSysteme\target\scala-2.13\classes ...
+[debug] Getting org.scala-sbt:compiler-bridge_2.13:1.4.4:compile for Scala 2.13.5
+[debug] [zinc] Running cached compiler 522483d9 for Scala compiler version 2.13.5
+[debug] [zinc] The Scala compiler is invoked with:
+[debug] 	-bootclasspath
+[debug] 	C:\Users\Prog\AppData\Local\Coursier\cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala-library\2.13.5\scala-library-2.13.5.jar
+[debug] 	-classpath
+[debug] 	E:\Projekte\BausteineVerteilterSysteme\target\scala-2.13\classes;E:\Projekte\BausteineVerteilterSysteme\lib\h2-1.4.200.jar;C:\Users\Prog\AppData\Local\Coursier\cache\v1\https\repo1.maven.org\maven2\com\typesafe\akka\akka-actor_2.13\2.6.14\akka-actor_2.13-2.6.14.jar;C:\Users\Prog\AppData\Local\Coursier\cache\v1\https\repo1.maven.org\maven2\com\typesafe\config\1.4.0\config-1.4.0.jar;C:\Users\Prog\AppData\Local\Coursier\cache\v1\https\repo1.maven.org\maven2\org\scala-lang\modules\scala-java8-compat_2.13\0.9.0\scala-java8-compat_2.13-0.9.0.jar
+[debug] Invalidating (transitively) by inheritance from Main...
+[debug] Initial set of included nodes: Main
+[debug] Invalidated by transitive inheritance dependency: Set(Main)
+[debug] Change NamesChange(Main,ModifiedNames(changes = UsedName(finalize,[Default]))) invalidates 1 classes due to The Main has the following regular definitions changed:
+[debug] 	UsedName(finalize,[Default]).
+[debug]   > by transitive inheritance: Set(Main)
+[debug]   > 
+[debug]   > 
+[debug]         
+[debug] New invalidations:
+[debug] Initial set of included nodes: 
+[debug] Previously invalidated, but (transitively) depend on new invalidations:
+[debug] Final step, transitive dependencies:
+[debug] 	Set()
+[debug] No classes were invalidated.
+[debug] Scala compilation took 2.6851972 s
+[info] done compiling

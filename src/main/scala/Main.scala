@@ -1,4 +1,4 @@
-import caseClasses.CSVFileMessage
+import caseClasses.{CSVFileMessage, CancelMessage}
 import akka.actor.{ActorSystem, Props}
 
 object Main {
