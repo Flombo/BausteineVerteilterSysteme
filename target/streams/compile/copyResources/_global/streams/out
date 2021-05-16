@@ -1,0 +1,4 @@
+[debug] Copy resource mappings: 
+[debug] 	(E:\Projekte\BausteineVerteilterSysteme\src\main\resources\client.conf,E:\Projekte\BausteineVerteilterSysteme\target\scala-2.13\classes\client.conf)
+[debug] 	(E:\Projekte\BausteineVerteilterSysteme\src\main\resources\common.conf,E:\Projekte\BausteineVerteilterSysteme\target\scala-2.13\classes\common.conf)
+[debug] 	(E:\Projekte\BausteineVerteilterSysteme\src\main\resources\dbWriter.conf,E:\Projekte\BausteineVerteilterSysteme\target\scala-2.13\classes\dbWriter.conf)

@@ -1,0 +1,11 @@
+[debug] Created transactional ClassFileManager with tempDir = E:\Projekte\BausteineVerteilterSysteme\target\scala-2.13\classes.bak
+[debug] About to delete class files:
+[debug] 	DBWriterCluster$.class
+[debug] 	DBWriterCluster.class
+[debug] We backup class files:
+[debug] 	DBWriterCluster$.class
+[debug] 	DBWriterCluster.class
+[debug] Registering generated classes:
+[debug] 	DBWriterCluster$.class
+[debug] 	DBWriterCluster.class
+[debug] Removing the temporary directory used for backing up class files: E:\Projekte\BausteineVerteilterSysteme\target\scala-2.13\classes.bak

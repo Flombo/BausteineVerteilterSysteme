@@ -1,0 +1,7 @@
+[debug] > Exec(run "E:/Projekte/BausteineVerteilterSysteme.zip", None, None)
+[debug] Evaluating tasks: Compile / run
+[debug] Running task... Cancel: Signal, check cycles: false, forcegc: true
+[info] compiling 2 Scala sources to E:\Projekte\BausteineVerteilterSysteme\target\scala-2.13\classes ...
+[warn] 2 deprecations (since 2.13.3); re-run with -deprecation for details
+[warn] one warning found
+[info] done compiling

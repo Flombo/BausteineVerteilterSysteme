@@ -2,26 +2,35 @@ import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 
 import java.io.File
-import java.sql.Timestamp
-import java.text.{ParseException, SimpleDateFormat}
-import java.util.Date
+import java.text.ParseException
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 object Utils {
 
-  private val simpleDateFormat = new SimpleDateFormat("dd.mm.yyyy hh:mm:ss")
+  private val format = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
 
   /**
-   * parses given string to timestamp over SimpleDateFormat.
+   * parses string to LocalDateTime with DateTimeFormatter
    *
    * @param text : String
+   * @throws ParseException
    * @return
    */
   @throws(classOf[ParseException])
-  def parseStringToTimestamp(text: String): Timestamp = {
-      val date: Date = simpleDateFormat.parse(text)
-      val timestamp = new Timestamp(date.getTime)
-      timestamp
-  }
+  def parseDateTime(text: String): LocalDateTime =
+    LocalDateTime.parse(text, format)
+
+  /**
+   * formats LocalDateTime to DateTime string.
+   *
+   * @param date : LocalDateTime
+   * @throws ParseException
+   * @return
+   */
+  @throws(classOf[ParseException])
+  def toDateTime(date: LocalDateTime): String =
+    date.format(format)
 
   def createSystem(fileName: String, systemName: String): ActorSystem = {
     val resource = getClass.getResource(fileName)
