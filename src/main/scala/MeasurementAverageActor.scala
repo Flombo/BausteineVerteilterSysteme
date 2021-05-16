@@ -1,14 +1,18 @@
 import caseClasses.{AverageMeasurementValueMessage, MeasurementValueMessage}
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorLogging, ActorSelection}
 
 import java.sql.{Connection, DriverManager, Timestamp}
 
-class MeasurementAverageActor(dbWriterActor : ActorRef) extends Actor{
+class MeasurementAverageActor extends Actor with ActorLogging {
 
   val driver : String = "org.h2.Driver"
   val url : String = "jdbc:h2:tcp://localhost/~/test"
   val username : String = "sa"
   val password : String = ""
+
+  val path="akka://bausteineverteiltersysteme@127.0.0.1:2565/user/dbwriteractor"
+
+  val dbWriterActor : ActorSelection = context.actorSelection(path)
 
   /**
    * preStart function will be executed before the Actor will be started.
@@ -28,7 +32,7 @@ class MeasurementAverageActor(dbWriterActor : ActorRef) extends Actor{
       Class.forName(driver)
       connection = DriverManager.getConnection(url, username, password)
     } catch {
-      case e => e.printStackTrace()
+      case e : Exception => e.printStackTrace()
     }
     connection
   }
@@ -63,7 +67,7 @@ class MeasurementAverageActor(dbWriterActor : ActorRef) extends Actor{
   }
 
   /**
-   *writes timestamps and measurements into jenameasurements table for further processing
+   *writes timestamps and measurements into JENAMEASUREMENTS table for further processing
    *
    * @param timestamp : Timestamp
    * @param degC : Float

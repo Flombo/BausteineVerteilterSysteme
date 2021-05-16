@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/BausteineVerteilterSysteme.iml" filepath="$PROJECT_DIR$/.idea/modules/BausteineVerteilterSysteme.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/BausteineVerteilterSysteme-build.iml" filepath="$PROJECT_DIR$/.idea/modules/BausteineVerteilterSysteme-build.iml" />
     </modules>
   </component>
 </project>

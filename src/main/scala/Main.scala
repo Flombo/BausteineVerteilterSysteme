@@ -1,20 +1,18 @@
-import caseClasses.{CSVFileMessage, CancelMessage}
-import akka.actor.{ActorSystem, Props}
+import caseClasses.CSVFileMessage
+import akka.actor.Props
 
-object Main {
-  def main(args: Array[String]): Unit = {
-    val dbWriterActor = ActorSystem("Bausteineverteiltersystem")
-      .actorOf(Props[DBWriterActor], name = "dbWriterActor")
+object Main extends App {
+    val measurementAverageActor = Utils
+      .createSystem("client.conf", "bausteineverteiltersysteme")
+      .actorOf(Props[MeasurementAverageActor], name="measurementaverageactor")
 
-    val measurementAverageActor = ActorSystem("Bausteineverteiltersystem")
-      .actorOf(Props(new MeasurementAverageActor(dbWriterActor)), name="measurementAverageActor")
+    val csvTextActor = Utils
+      .createSystem("client.conf", "bausteineverteiltersysteme")
+      .actorOf(Props(new CSVTextActor(measurementAverageActor)), name="csvtextactor")
 
-    val csvTextActor = ActorSystem("Bausteineverteiltersystem")
-      .actorOf(Props(new CSVTextActor(measurementAverageActor)), name="csvTextActor")
+    val csvFileActor = Utils
+      .createSystem("client.conf", "bausteineverteiltersysteme")
+      .actorOf(Props(new CSVFileActor(csvTextActor)), name = "csvfileactor")
 
-    val CSVFileActor = ActorSystem("Bausteineverteiltersystem")
-      .actorOf(Props(new CSVFileActor(csvTextActor)), name="csvFileActor")
-
-    CSVFileActor ! CSVFileMessage(".\\src\\main\\scala\\jenaAusschnitt.csv")
-  }
+    csvFileActor ! CSVFileMessage(".\\src\\main\\scala\\jenaAusschnitt.csv")
 }
