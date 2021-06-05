@@ -1,7 +1,10 @@
 import caseClasses.{AverageMeasurementValueMessage, MeasurementValueMessage}
-import akka.actor.{Actor, ActorLogging, ActorSelection}
+import akka.actor.{Actor, ActorLogging, ActorSelection, DeadLetter, RootActorPath}
+import akka.cluster.{Cluster, Member, MemberStatus}
+import akka.cluster.ClusterEvent.{CurrentClusterState, MemberDowned, MemberUp}
 
 import java.sql.{Connection, DriverManager, Timestamp}
+import java.util
 
 class MeasurementAverageActor extends Actor with ActorLogging {
 
@@ -9,28 +12,27 @@ class MeasurementAverageActor extends Actor with ActorLogging {
   val url : String = "jdbc:h2:tcp://localhost/~/test"
   val username : String = "sa"
   val password : String = ""
-
-  val path="akka://bausteineverteiltersysteme@127.0.0.1:2565/user/dbwriteractor"
-
-  val dbWriterActor : ActorSelection = context.actorSelection(path)
+  val cluster : Cluster = Cluster(context.system)
+  var dbHandlerActor: Option[ActorSelection] = None
+  var receivedTimestamps : util.LinkedList[Timestamp] = new util.LinkedList[Timestamp]()
 
   /**
    * preStart function will be executed before the Actor will be started.
    * builds db tables jena and jenameasurements if the don't already exist.
    */
   override def preStart(): Unit = {
-    super.preStart()
     createDBTables()
+    cluster.subscribe(self, classOf[MemberUp])
   }
 
   /**
    * opens connection and returns it for further usage
    */
-  def connectToH2(): Connection = {
-    var connection: Connection = null
+  def connectToH2(): Option[Connection] = {
+    var connection: Option[Connection] = None
     try {
       Class.forName(driver)
-      connection = DriverManager.getConnection(url, username, password)
+      connection = Some(DriverManager.getConnection(url, username, password))
     } catch {
       case e : Exception => e.printStackTrace()
     }
@@ -44,24 +46,27 @@ class MeasurementAverageActor extends Actor with ActorLogging {
    * @return
    */
   def readMeasurementsFromDBAndBuildAverage(timestamp: Timestamp) : Float = {
-    val connection : Connection = connectToH2()
-    var degcavg : Float = 0
-    if(connection != null) {
-      val prepareStatement = connection.prepareStatement("SELECT AVG(DEGC) as DEGCAVG from JENAMEASUREMENTS where MESSAGETIMESTAMP >= ? AND MESSAGETIMESTAMP <= ?;")
+    val connection : Option[Connection] = connectToH2()
+    var degcavg: Float = 0
 
-      //builds the timestamp for yesterday from given timestamp
-      val yesterday = Timestamp.valueOf(timestamp.toLocalDateTime.minusHours(24))
+    if(connection.isDefined) {
+      if (connection != null) {
+        val prepareStatement = connection.get.prepareStatement("SELECT AVG(DEGC) as DEGCAVG from JENAMEASUREMENTS where MESSAGETIMESTAMP >= ? AND MESSAGETIMESTAMP <= ?;")
 
-      prepareStatement.setString(1, yesterday.toString)
-      prepareStatement.setString(2, timestamp.toString)
-      val resultSet = prepareStatement.executeQuery()
-      resultSet.next()
+        //builds the timestamp for yesterday from given timestamp
+        val yesterday = Timestamp.valueOf(timestamp.toLocalDateTime.minusHours(24))
 
-      degcavg = resultSet.getFloat("DEGCAVG")
+        prepareStatement.setString(1, yesterday.toString)
+        prepareStatement.setString(2, timestamp.toString)
+        val resultSet = prepareStatement.executeQuery()
+        resultSet.next()
 
-      resultSet.close()
-      prepareStatement.close()
-      connection.close()
+        degcavg = resultSet.getFloat("DEGCAVG")
+
+        resultSet.close()
+        prepareStatement.close()
+        connection.get.close()
+      }
     }
     degcavg
   }
@@ -73,50 +78,87 @@ class MeasurementAverageActor extends Actor with ActorLogging {
    * @param degC : Float
    */
   def writeMeasurementIntoMeasurementTable(timestamp: Timestamp, degC : Float): Unit = {
-    val connection : Connection = connectToH2()
-    val prepareStatement = connection.prepareStatement("INSERT INTO JENAMEASUREMENTS(MESSAGETIMESTAMP , DEGC) values (? ,? );")
+    val connection : Option[Connection] = connectToH2()
 
-    prepareStatement.setTimestamp(1, timestamp)
-    prepareStatement.setFloat(2, degC)
+    if(connection.isDefined) {
+      val prepareStatement = connection.get.prepareStatement("INSERT INTO JENAMEASUREMENTS(MESSAGETIMESTAMP , DEGC) values (? ,? );")
 
-    prepareStatement.execute()
-    prepareStatement.close()
-    connection.close()
+      prepareStatement.setTimestamp(1, timestamp)
+      prepareStatement.setFloat(2, degC)
+
+      prepareStatement.execute()
+      prepareStatement.close()
+      connection.get.close()
+    }
   }
 
   /**
    * creates tables 'jena' and 'jenameasurments' if they don't already exist.
    */
   def createDBTables(): Unit = {
-    val connection : Connection = connectToH2()
+    val connection : Option[Connection] = connectToH2()
 
-    var prepareStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS jena(id bigint not null auto_increment primary key, messagetimestamp timestamp not null, degcavg float not null);")
-    prepareStatement.execute()
-    prepareStatement.close()
+    if(connection.isDefined) {
+      var prepareStatement = connection.get.prepareStatement("CREATE TABLE IF NOT EXISTS jena(id bigint not null auto_increment primary key, messagetimestamp timestamp not null, degcavg float not null);")
+      prepareStatement.execute()
+      prepareStatement.close()
 
-    prepareStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS jenameasurements(id bigint not null auto_increment primary key, messagetimestamp timestamp not null, degc float not null);")
-    prepareStatement.execute()
-    prepareStatement.close()
+      prepareStatement = connection.get.prepareStatement("CREATE TABLE IF NOT EXISTS jenameasurements(id bigint not null auto_increment primary key, messagetimestamp timestamp not null, degc float not null);")
+      prepareStatement.execute()
+      prepareStatement.close()
 
-    connection.close()
+      connection.get.close()
+    }
+  }
+
+  def register(member : Member): Unit = {
+    if(member.hasRole("dbhandler")) {
+      log.info("found dbhandler : " + member)
+      dbHandlerActor = Some(context.actorSelection(RootActorPath(member.address) / "user" / "dbhandler"))
+    }
+  }
+
+  def sendAverageMeasurementValueMessage(dbHandler : ActorSelection): Unit = {
+    try {
+      receivedTimestamps.forEach(receivedTimestamp => {
+        val averageMeasurement = readMeasurementsFromDBAndBuildAverage(receivedTimestamp)
+        println("Average measurements of the last 24 hrs : " + averageMeasurement + " at timestamp : " + receivedTimestamp)
+        dbHandler ! AverageMeasurementValueMessage(receivedTimestamp, averageMeasurement)
+      })
+
+      receivedTimestamps.clear()
+    } catch {
+      case exception: Exception =>
+        println("Error happened:" + exception)
+    }
   }
 
   /**
    * receive handler will be called when message was received.
    * If the message is part of the CaseClasses.MeasurementValueMessage case-class:
    *  -the writeMeasurementIntoMeasurementTable function will be called with the timestamp and measurement attributes of the message.
-   *  -after that, the readMeasurementsFromDBAndBuildAverage function will be called with the timestamp of the message for retrieving the moving average of the last 24hrs.
-   *  -in the end a AverageMeasurementValueMessage will be sent to the DBWriterActor actor built by the message timestamp and the created moving average.
+   *  -in the end the recieved needs to be persisted, for later usage, when the dbHandlerActor is up.
+   *
    * @return
    */
   def receive(): Receive = {
+    case MemberUp(member) =>
+      log.info("recieved : " + member)
+      register(member)
+
+      dbHandlerActor match {
+        case None => log.info("not yet registered ...")
+        case Some(dbHandler: ActorSelection) =>
+          sendAverageMeasurementValueMessage(dbHandler)
+      }
+
+    case state : CurrentClusterState =>
+      log.info("recieved currentCluserState : " + state)
+      state.members.filter(_.status == MemberStatus.Up).foreach(register)
+
     case message : MeasurementValueMessage =>
       writeMeasurementIntoMeasurementTable(message.timestamp, message.degC)
-
-      val averageMeasurements = readMeasurementsFromDBAndBuildAverage(message.timestamp)
-      println("Average measurements of the last 24 hrs : " + averageMeasurements + " at timestamp : " + message.timestamp)
-
-      dbWriterActor ! AverageMeasurementValueMessage(message.timestamp, averageMeasurements)
+      receivedTimestamps.add(message.timestamp)
   }
 
   /**
@@ -127,6 +169,10 @@ class MeasurementAverageActor extends Actor with ActorLogging {
   override def unhandled(message: Any): Unit = {
     super.unhandled(message)
     println("MeasurementAverageActor : faulty message type received: " + message)
+  }
+
+  override def postStop(): Unit = {
+    cluster.unsubscribe(self)
   }
 
 }

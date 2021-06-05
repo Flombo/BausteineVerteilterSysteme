@@ -9,12 +9,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e349bc44-448d-4fb6-bf2a-20b5d9a39adb" name="Default Changelist" comment="BVS Aufgabe2 ActorCluster und REST-API für die Abfrage von gleitenden Mittelwerten">
+    <list default="true" id="e349bc44-448d-4fb6-bf2a-20b5d9a39adb" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/BausteineVerteilterSysteme.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/BausteineVerteilterSysteme.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/target/streams/_global/dependencyPositions/_global/streams/update_cache_2.12/output_dsp" beforeDir="false" afterPath="$PROJECT_DIR$/project/target/streams/_global/dependencyPositions/_global/streams/update_cache_2.12/output_dsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/target/streams/_global/update/_global/streams/out" beforeDir="false" afterPath="$PROJECT_DIR$/project/target/streams/_global/update/_global/streams/out" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/DBWriterCluster.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/DBWriterCluster.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/Utils.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/Utils.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/common.conf" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/common.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/dbWriter.conf" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/dbWriter.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/DBWriterActor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/DBHandlerActor.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/DBWriterCluster.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/DBHandlerCluster.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/Main.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/Main.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/MeasurementAverageActor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MeasurementAverageActor.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/jenaAusschnitt.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/jenaAusschnitt.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/Main$.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/Main$.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/MeasurementAverageActor$$anonfun$receive$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/MeasurementAverageActor$$anonfun$receive$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/MeasurementAverageActor.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/MeasurementAverageActor.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/common.conf" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/common.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/dbWriter.conf" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/dbWriter.conf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,11 +109,11 @@
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.last.edited" value="Problems" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="configurable.group.build" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -112,16 +123,16 @@
       <recent name="E:\Projekte\BausteineVerteilterSysteme\src\libs" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Projekte\BausteineVerteilterSysteme\src\main\resources" />
+      <recent name="E:\Projekte\BausteineVerteilterSysteme\src\main" />
       <recent name="E:\Projekte\BausteineVerteilterSysteme\target\scala-2.13" />
       <recent name="E:\Projekte\BausteineVerteilterSysteme\target\resources" />
       <recent name="E:\Projekte\BausteineVerteilterSysteme\target" />
-      <recent name="E:\Projekte\BausteineVerteilterSysteme\target\scala-2.13\classes\resources" />
-      <recent name="E:\Projekte\BausteineVerteilterSysteme\src\main\resources" />
     </key>
   </component>
   <component name="RunManager" selected="Application.Main">
     <configuration name="DBWriterCluster (1)" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="DBWriterCluster" />
+      <option name="MAIN_CLASS_NAME" value="DBHandlerCluster" />
       <module name="BausteineVerteilterSysteme" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -202,7 +213,14 @@
       <workItem from="1621067508974" duration="5356000" />
       <workItem from="1621152333274" duration="2815000" />
       <workItem from="1621171541045" duration="635000" />
-      <workItem from="1621172285063" duration="219000" />
+      <workItem from="1621172285063" duration="383000" />
+      <workItem from="1621173324759" duration="103000" />
+      <workItem from="1621239733517" duration="1893000" />
+      <workItem from="1621602400049" duration="4024000" />
+      <workItem from="1622884651042" duration="364000" />
+      <workItem from="1622885319859" duration="162000" />
+      <workItem from="1622885513133" duration="1886000" />
+      <workItem from="1622897193099" duration="5333000" />
     </task>
     <task id="LOCAL-00001" summary="Aufgabenblatt1">
       <created>1620547613072</created>
@@ -225,7 +243,14 @@
       <option name="project" value="LOCAL" />
       <updated>1620550138358</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="BVS Abgabe2 Verbesserungen">
+      <created>1621172566597</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1621172566597</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -248,6 +273,7 @@
     <MESSAGE value="Added comments in MeasurementAverageActor.scala for preStart function" />
     <MESSAGE value="Added comments in MeasurementAverageActor.scala for preStart function and refactored connectToH2 function" />
     <MESSAGE value="BVS Aufgabe2 ActorCluster und REST-API für die Abfrage von gleitenden Mittelwerten" />
-    <option name="LAST_COMMIT_MESSAGE" value="BVS Aufgabe2 ActorCluster und REST-API für die Abfrage von gleitenden Mittelwerten" />
+    <MESSAGE value="BVS Abgabe2 Verbesserungen" />
+    <option name="LAST_COMMIT_MESSAGE" value="BVS Abgabe2 Verbesserungen" />
   </component>
 </project>

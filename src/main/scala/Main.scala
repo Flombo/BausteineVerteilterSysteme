@@ -14,5 +14,5 @@ object Main extends App {
       .createSystem("client.conf", "bausteineverteiltersysteme")
       .actorOf(Props(new CSVFileActor(csvTextActor)), name = "csvfileactor")
 
-    csvFileActor ! CSVFileMessage(".\\src\\main\\scala\\jenaAusschnitt.csv")
+    csvFileActor ! CSVFileMessage(".\\src\\main\\resources\\jenaAusschnitt.csv")
 }

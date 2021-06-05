@@ -1,18 +1,16 @@
 import caseClasses.{AverageMeasurementResponseMessage, AverageMeasurementValueMessage, CancelMessage, RequestAverageMeasurementMessage}
 import akka.actor.{Actor, ActorLogging}
-
 import java.sql.{Connection, DriverManager, PreparedStatement, ResultSet, SQLDataException, Timestamp}
 
-class DBWriterActor extends Actor with ActorLogging{
+class DBHandlerActor extends Actor with ActorLogging{
 
   val driver : String = "org.h2.Driver"
   val url : String = "jdbc:h2:tcp://localhost/~/test"
   val username : String = "sa"
   val password : String = ""
-  var connection : Connection = null
-  var insertPreparedStatement : PreparedStatement = null
-  var selectPreparedStatement : PreparedStatement = null
-
+  var connection : Option[Connection] = None
+  var insertPreparedStatement : Option[PreparedStatement] = None
+  var selectPreparedStatement : Option[PreparedStatement] = None
   /**
    * preStart handler will be called before the actor will be started.
    * A db-connection will be opened before the actor will be started.
@@ -21,15 +19,15 @@ class DBWriterActor extends Actor with ActorLogging{
     super.preStart()
     connectToH2()
     createTable()
-    insertPreparedStatement = connection.prepareStatement("INSERT INTO JENA(MESSAGETIMESTAMP , DEGCAVG) VALUES(?, ?)")
-    selectPreparedStatement = connection.prepareStatement("SELECT DEGCAVG from JENA where MESSAGETIMESTAMP = ?")
+    insertPreparedStatement = Some(connection.get.prepareStatement("INSERT INTO JENA(MESSAGETIMESTAMP , DEGCAVG) VALUES(?, ?)"))
+    selectPreparedStatement = Some(connection.get.prepareStatement("SELECT DEGCAVG from JENA where MESSAGETIMESTAMP = ?"))
   }
 
   /**
    * creates table jena.
    */
   def createTable() : Unit = {
-    val statement = connection.createStatement()
+    val statement = connection.get.createStatement()
     statement.execute("CREATE TABLE IF NOT EXISTS jena(id bigint not null auto_increment primary key, messagetimestamp timestamp not null, degcavg float not null);")
     statement.close()
   }
@@ -40,7 +38,7 @@ class DBWriterActor extends Actor with ActorLogging{
   def connectToH2() {
     try {
       Class.forName(driver)
-      connection = DriverManager.getConnection(url, username, password)
+      connection = Some(DriverManager.getConnection(url, username, password))
     } catch {
       case e : Exception => e.printStackTrace()
     }
@@ -53,9 +51,9 @@ class DBWriterActor extends Actor with ActorLogging{
    */
   def writeIntoDB(date : Timestamp, degCAVG : Float)  {
     try {
-      insertPreparedStatement.setTimestamp(1, date)
-      insertPreparedStatement.setFloat(2, degCAVG)
-      insertPreparedStatement.execute()
+      insertPreparedStatement.get.setTimestamp(1, date)
+      insertPreparedStatement.get.setFloat(2, degCAVG)
+      insertPreparedStatement.get.execute()
     } catch {
       case e : Exception => e.printStackTrace()
     }
@@ -68,15 +66,21 @@ class DBWriterActor extends Actor with ActorLogging{
    * @param timestamp : Timestamp
    * @return
    */
-  def selectAverageMeasurementByTimestamp(timestamp: Timestamp): Float = {
+  def selectAverageMeasurementByTimestamp(timestamp: Timestamp): Option[Float] = {
+    val degCAVG: Option[Float] = None
+
     try {
-      selectPreparedStatement.setTimestamp(1, timestamp)
-      val resultSet : ResultSet = selectPreparedStatement.executeQuery()
-      resultSet.next()
-      resultSet.getFloat("degcavg")
+      selectPreparedStatement.get.setTimestamp(1, timestamp)
+      val resultSet : ResultSet = selectPreparedStatement.get.executeQuery()
+      var degCAVG : Option[Float] = None
+      if(resultSet.next()) {
+        degCAVG = Some(resultSet.getFloat("degcavg"))
+      }
+      degCAVG
     } catch {
-      case e : SQLDataException => e.printStackTrace()
-        throw new Exception
+      case e : SQLDataException =>
+        e.printStackTrace()
+        degCAVG
     }
   }
 
@@ -94,7 +98,7 @@ class DBWriterActor extends Actor with ActorLogging{
    */
   def receive(): Receive = {
     case _: CancelMessage =>
-      connection.close()
+      connection.get.close()
       context.stop(self)
       println("DBWriterActor : ressources closed...")
       println("DBWriterActor : actor closed")
@@ -104,13 +108,8 @@ class DBWriterActor extends Actor with ActorLogging{
       writeIntoDB(message.timestamp, message.averageMeasurement)
 
     case RequestAverageMeasurementMessage(timestamp) =>
-      var averageMeasurement : Option[Float] = null
-      try {
-        averageMeasurement = Some(selectAverageMeasurementByTimestamp(timestamp))
+        val averageMeasurement : Option[Float] = selectAverageMeasurementByTimestamp(timestamp)
         sender() ! AverageMeasurementResponseMessage(averageMeasurement)
-      } catch {
-        case _: Exception => sender() ! AverageMeasurementResponseMessage(averageMeasurement)
-      }
   }
 
   /**
@@ -121,6 +120,10 @@ class DBWriterActor extends Actor with ActorLogging{
   override def unhandled(message: Any): Unit = {
     super.unhandled(message)
     println("Unknown case message : " + message)
+  }
+
+  override def postStop(): Unit = {
+    super.postStop()
   }
 
 }

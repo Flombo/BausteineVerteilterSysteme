@@ -9,14 +9,13 @@ import java.sql.Timestamp
 import java.text.ParseException
 import java.time.LocalDateTime
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, ExecutionContextExecutor, Future}
-import scala.io.StdIn
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.language.postfixOps
 
-object DBWriterCluster extends App {
+object DBHandlerCluster extends App {
 
   val system : ActorSystem = Utils.createSystem("dbWriter.conf", "bausteineverteiltersysteme")
-  val dbwriterActor : ActorRef = system.actorOf(Props[DBWriterActor], name="dbwriteractor")
+  val dbHandlerActor : ActorRef = system.actorOf(Props[DBHandlerActor], name="dbhandler")
 
   /**
    * extracts timestamp from GET Parameter.
@@ -27,7 +26,7 @@ object DBWriterCluster extends App {
    * @return
    */
   @throws(classOf[ParseException])
-  def extractTimestampFromGETParameter(timestampString: String) : LocalDateTime = {
+  def extractLocalDateTimeFromGETParameter(timestampString: String) : LocalDateTime = {
     val timestampStringWithReplacedUnderScores: String = timestampString.replace('_', ' ')
     Utils.parseDateTime(timestampStringWithReplacedUnderScores)
   }
@@ -56,20 +55,29 @@ object DBWriterCluster extends App {
         pathPrefix("when" / PathMatchers.RemainingPath) {
           timestampString =>
             try {
-              val timestampOfParameter: LocalDateTime = extractTimestampFromGETParameter(timestampString.toString())
+              val localDateTimeOfParameter : LocalDateTime = extractLocalDateTimeFromGETParameter(timestampString.toString())
 
               val response: Future[AverageMeasurementResponseMessage] = (
-                dbwriterActor ? RequestAverageMeasurementMessage(
-                  Timestamp.valueOf(timestampOfParameter)
+                dbHandlerActor ? RequestAverageMeasurementMessage(
+                  Timestamp.valueOf(localDateTimeOfParameter)
                 )
                 ).mapTo[AverageMeasurementResponseMessage]
 
-              val averageMeasurementResponseMessage : AverageMeasurementResponseMessage = Await.result(response, timeout.duration)
+              onComplete(response) {
+                averageMeasurementResponseMessage =>
 
-              if(averageMeasurementResponseMessage.averageMeasurement != null) {
-                complete("{ when : " + Utils.toDateTime(timestampOfParameter) + ", what : " + averageMeasurementResponseMessage.averageMeasurement.get + " }")
-              } else {
-                complete("{ when : " + Utils.toDateTime(timestampOfParameter) +  " }")
+                  if (averageMeasurementResponseMessage.isSuccess) {
+
+                    if (averageMeasurementResponseMessage.get.averageMeasurement.isDefined) {
+                      complete("{ when : " + Utils.toDateTime(localDateTimeOfParameter) + ", what : " + averageMeasurementResponseMessage.get.averageMeasurement.get + " }")
+                    } else {
+                      complete("{ when : " + Utils.toDateTime(localDateTimeOfParameter) + " }")
+                    }
+
+                  } else {
+                    complete("{ when : " + Utils.toDateTime(localDateTimeOfParameter) + " }")
+                  }
+
               }
 
             } catch {
@@ -78,14 +86,7 @@ object DBWriterCluster extends App {
             }
         }
       }
-
-    val bindingFuture = Http().bindAndHandle(route,"localhost", 8080)
-
-    println(s"Server online at http://localhost:8080/when\nPress RETURN to stop...")
-    StdIn.readLine() // let it run until user presses return
-    bindingFuture
-      .flatMap(_.unbind()) // trigger unbinding from the port
-      .onComplete(_ => system.terminate()) // and shutdown when done
+    Http().newServerAt("localhost", 8080).bind(route)
   }
 }
 
