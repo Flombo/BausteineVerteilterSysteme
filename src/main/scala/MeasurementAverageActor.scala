@@ -1,8 +1,7 @@
 import caseClasses.{AverageMeasurementValueMessage, MeasurementValueMessage}
-import akka.actor.{Actor, ActorLogging, ActorSelection, DeadLetter, RootActorPath}
+import akka.actor.{Actor, ActorLogging, ActorSelection, RootActorPath}
 import akka.cluster.{Cluster, Member, MemberStatus}
-import akka.cluster.ClusterEvent.{CurrentClusterState, MemberDowned, MemberUp}
-
+import akka.cluster.ClusterEvent.{CurrentClusterState, MemberUp}
 import java.sql.{Connection, DriverManager, Timestamp}
 import java.util
 
@@ -13,7 +12,6 @@ class MeasurementAverageActor extends Actor with ActorLogging {
   val username : String = "sa"
   val password : String = ""
   val cluster : Cluster = Cluster(context.system)
-  var dbHandlerActor: Option[ActorSelection] = None
   var receivedTimestamps : util.LinkedList[Timestamp] = new util.LinkedList[Timestamp]()
 
   /**
@@ -114,23 +112,18 @@ class MeasurementAverageActor extends Actor with ActorLogging {
   def register(member : Member): Unit = {
     if(member.hasRole("dbhandler")) {
       log.info("found dbhandler : " + member)
-      dbHandlerActor = Some(context.actorSelection(RootActorPath(member.address) / "user" / "dbhandler"))
+      sendAverageMeasurementValueMessageToDBHandlerActor(context.actorSelection(RootActorPath(member.address) / "user" / "dbhandler"))
     }
   }
 
-  def sendAverageMeasurementValueMessage(dbHandler : ActorSelection): Unit = {
-    try {
+  def sendAverageMeasurementValueMessageToDBHandlerActor(dbHandlerActor : ActorSelection): Unit = {
       receivedTimestamps.forEach(receivedTimestamp => {
         val averageMeasurement = readMeasurementsFromDBAndBuildAverage(receivedTimestamp)
         println("Average measurements of the last 24 hrs : " + averageMeasurement + " at timestamp : " + receivedTimestamp)
-        dbHandler ! AverageMeasurementValueMessage(receivedTimestamp, averageMeasurement)
+        dbHandlerActor ! AverageMeasurementValueMessage(receivedTimestamp, averageMeasurement)
       })
 
       receivedTimestamps.clear()
-    } catch {
-      case exception: Exception =>
-        println("Error happened:" + exception)
-    }
   }
 
   /**
@@ -145,12 +138,6 @@ class MeasurementAverageActor extends Actor with ActorLogging {
     case MemberUp(member) =>
       log.info("recieved : " + member)
       register(member)
-
-      dbHandlerActor match {
-        case None => log.info("not yet registered ...")
-        case Some(dbHandler: ActorSelection) =>
-          sendAverageMeasurementValueMessage(dbHandler)
-      }
 
     case state : CurrentClusterState =>
       log.info("recieved currentCluserState : " + state)

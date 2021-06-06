@@ -10,22 +10,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e349bc44-448d-4fb6-bf2a-20b5d9a39adb" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/BausteineVerteilterSysteme.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/BausteineVerteilterSysteme.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/common.conf" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/common.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/dbWriter.conf" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/dbWriter.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/DBWriterActor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/DBHandlerActor.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/DBWriterCluster.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/DBHandlerCluster.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/Main.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/Main.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/MeasurementAverageActor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MeasurementAverageActor.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/jenaAusschnitt.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/jenaAusschnitt.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/Main$.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/Main$.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/Main.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/MeasurementAverageActor$$anonfun$receive$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/MeasurementAverageActor$$anonfun$receive$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/MeasurementAverageActor.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/MeasurementAverageActor.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/common.conf" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/common.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/dbWriter.conf" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/dbWriter.conf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -220,7 +208,9 @@
       <workItem from="1622884651042" duration="364000" />
       <workItem from="1622885319859" duration="162000" />
       <workItem from="1622885513133" duration="1886000" />
-      <workItem from="1622897193099" duration="5333000" />
+      <workItem from="1622897193099" duration="5462000" />
+      <workItem from="1622984656598" duration="242000" />
+      <workItem from="1622984927125" duration="1348000" />
     </task>
     <task id="LOCAL-00001" summary="Aufgabenblatt1">
       <created>1620547613072</created>
@@ -250,7 +240,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621172566597</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="BVS Abgabe3">
+      <created>1622902647555</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1622902647556</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -274,6 +271,7 @@
     <MESSAGE value="Added comments in MeasurementAverageActor.scala for preStart function and refactored connectToH2 function" />
     <MESSAGE value="BVS Aufgabe2 ActorCluster und REST-API für die Abfrage von gleitenden Mittelwerten" />
     <MESSAGE value="BVS Abgabe2 Verbesserungen" />
-    <option name="LAST_COMMIT_MESSAGE" value="BVS Abgabe2 Verbesserungen" />
+    <MESSAGE value="BVS Abgabe3" />
+    <option name="LAST_COMMIT_MESSAGE" value="BVS Abgabe3" />
   </component>
 </project>
