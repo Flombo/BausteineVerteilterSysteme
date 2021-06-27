@@ -1,5 +1,6 @@
-import caseClasses.{AverageMeasurementResponseMessage, AverageMeasurementValueMessage, CancelMessage, RequestAverageMeasurementMessage}
+import caseClasses.{AverageMeasurementResponseMessage, AverageMeasurementValueMessage, CancelMessage, CountDBRowsMessage, CountDBRowsResponseMessage, RequestAverageMeasurementMessage}
 import akka.actor.{Actor, ActorLogging}
+
 import java.sql.{Connection, DriverManager, PreparedStatement, ResultSet, SQLDataException, Timestamp}
 
 class DBHandlerActor extends Actor with ActorLogging{
@@ -11,6 +12,9 @@ class DBHandlerActor extends Actor with ActorLogging{
   var connection : Option[Connection] = None
   var insertPreparedStatement : Option[PreparedStatement] = None
   var selectPreparedStatement : Option[PreparedStatement] = None
+  var countDBRowsPreparedStatement : Option[PreparedStatement] = None
+  var i = 0
+
   /**
    * preStart handler will be called before the actor will be started.
    * A db-connection will be opened before the actor will be started.
@@ -21,6 +25,7 @@ class DBHandlerActor extends Actor with ActorLogging{
     createTable()
     insertPreparedStatement = Some(connection.get.prepareStatement("INSERT INTO JENA(MESSAGETIMESTAMP , DEGCAVG) VALUES(?, ?)"))
     selectPreparedStatement = Some(connection.get.prepareStatement("SELECT DEGCAVG from JENA where MESSAGETIMESTAMP = ?"))
+    countDBRowsPreparedStatement = Some(connection.get.prepareStatement("SELECT COUNT(*) as count_jena FROM JENA"))
   }
 
   /**
@@ -84,6 +89,24 @@ class DBHandlerActor extends Actor with ActorLogging{
     }
   }
 
+  def getRowCount() : Option[Int] = {
+    var rowCount: Option[Int] = None
+
+    try {
+      val resultSet :  ResultSet = countDBRowsPreparedStatement.get.executeQuery()
+
+      if(resultSet.next()) {
+        rowCount = Some(resultSet.getInt("count_jena"))
+      }
+
+      rowCount
+    } catch {
+      case e : SQLDataException =>
+        e.printStackTrace()
+        rowCount
+    }
+  }
+
   /**
    * receive handler will be called when message was received.
    * If the message is part of the CaseClasses.AverageMeasurementValueMessage case-class, a new entry in jena db-table will be inserted.
@@ -104,12 +127,16 @@ class DBHandlerActor extends Actor with ActorLogging{
       println("DBWriterActor : actor closed")
 
     case message : AverageMeasurementValueMessage =>
-      println("DBWriterActor : actor received AverageMeasurementValueMessage: " + message)
+      i = i + 1
+      println("DBWriterActor : actor received AverageMeasurementValueMessage: " + message + " iteration : " + i)
       writeIntoDB(message.timestamp, message.averageMeasurement)
 
     case RequestAverageMeasurementMessage(timestamp) =>
-        val averageMeasurement : Option[Float] = selectAverageMeasurementByTimestamp(timestamp)
-        sender() ! AverageMeasurementResponseMessage(averageMeasurement)
+      val averageMeasurement : Option[Float] = selectAverageMeasurementByTimestamp(timestamp)
+      sender() ! AverageMeasurementResponseMessage(averageMeasurement)
+
+    case CountDBRowsMessage =>
+      sender() ! CountDBRowsResponseMessage(getRowCount())
   }
 
   /**

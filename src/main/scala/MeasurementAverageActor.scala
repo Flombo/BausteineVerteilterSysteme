@@ -1,19 +1,17 @@
-import caseClasses.{AverageMeasurementValueMessage, MeasurementValueMessage}
+import caseClasses.{AverageMeasurementValueMessage, MeasurementValueMessage, StartMovingAverageCalculation}
 import akka.actor.{Actor, ActorLogging, ActorSelection, RootActorPath}
 import akka.cluster.{Cluster, Member, MemberStatus}
 import akka.cluster.ClusterEvent.{CurrentClusterState, MemberUp}
-import org.h2.value.ValueDecimal.setScale
-
+import scala.math.BigDecimal.double2bigDecimal
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util
-import scala.math.BigDecimal.double2bigDecimal
 
 class MeasurementAverageActor extends Actor with ActorLogging {
 
   val cluster : Cluster = Cluster(context.system)
-  var receivedValuesPuffer : util.HashMap[Timestamp, Float] = new util.HashMap[Timestamp, Float]()
-  var receivedValues : util.HashMap[Timestamp, Float] = new util.HashMap[Timestamp, Float]()
+  var receivedValuesPuffer : util.LinkedList[(Timestamp, Float)] = new util.LinkedList[(Timestamp, Float)]()
+  var receivedValues : util.LinkedList[(String, Timestamp, Float)] = new util.LinkedList[(String, Timestamp, Float)]()
   var dbHandlerActor: Option[ActorSelection] = None
 
   /**
@@ -25,11 +23,10 @@ class MeasurementAverageActor extends Actor with ActorLogging {
 
   def register(member : Member): Unit = {
     if(member.hasRole("dbhandler")) {
-      log.info("found dbhandler : " + member)
       dbHandlerActor = Some(context.actorSelection(RootActorPath(member.address) / "user" / "dbhandler"))
 
-      receivedValuesPuffer.forEach((timestamp, movingAverage) => {
-        dbHandlerActor.get ! AverageMeasurementValueMessage(timestamp = timestamp, averageMeasurement = movingAverage)
+      receivedValuesPuffer.forEach(entry => {
+        dbHandlerActor.get ! AverageMeasurementValueMessage(entry._1, entry._2)
       })
     }
   }
@@ -44,49 +41,62 @@ class MeasurementAverageActor extends Actor with ActorLogging {
    */
   def receive(): Receive = {
     case MemberUp(member) =>
-      log.info("recieved : " + member)
       register(member)
 
     case state : CurrentClusterState =>
-      log.info("recieved currentClusterState : " + state)
       state.members.filter(_.status == MemberStatus.Up).foreach(register)
 
     case message : MeasurementValueMessage =>
-      receivedValues.put(message.timestamp, message.degC)
-      val movingAverage : Float = buildMovingAverage(message.timestamp)
+      receivedValues.addLast((message.filename, message.timestamp, message.degC))
 
-      log.info("movingAverage : " + movingAverage + " timestamp : " + message.timestamp)
+    case startMovingAverageCalculation: StartMovingAverageCalculation =>
+      val sentFilename : String = startMovingAverageCalculation.filename
+
+      calcMovingAverage(sentFilename)
 
       dbHandlerActor match {
         case Some(dbHandlerActor) =>
-          dbHandlerActor ! AverageMeasurementValueMessage(message.timestamp, movingAverage)
+          receivedValuesPuffer.forEach(entry => {
+            dbHandlerActor ! AverageMeasurementValueMessage(entry._1, entry._2)
+          })
         case None =>
-          receivedValuesPuffer.put(message.timestamp, movingAverage)
+          println("No DBHandlerActor registered")
       }
+
   }
 
-  def buildMovingAverage(timestamp: Timestamp) : Float = {
+  def calcMovingAverage(sentFilename : String): Unit = {
+    receivedValues.forEach(entry => {
+      val filename : String = entry._1
+      val timestamp : Timestamp = entry._2
+
+      if(filename.equals(sentFilename)) {
+        val movingAverage : Float = buildMovingAverage(timestamp, filename)
+        println(movingAverage + " avg / timestamp " + timestamp)
+        receivedValuesPuffer.addLast((timestamp, movingAverage))
+      }
+    })
+  }
+
+  def buildMovingAverage(timestamp: Timestamp, filename : String) : Float = {
     var sumOfRecievedValues : Float = 0
-    var removableTimestamp: Timestamp = null
 
     val now : LocalDateTime = timestamp.toLocalDateTime
-    val yesterday : Timestamp = Timestamp.valueOf(now.minusHours(24))
+    val yesterday : Timestamp = Timestamp.valueOf(now.minusHours(24).minusSeconds(1))
 
-    receivedValues.keySet.forEach(timestamp => {
-      if(yesterday.compareTo(timestamp) > 0) {
-        removableTimestamp = timestamp
+    var measurementAmount = 0
+
+    receivedValues.forEach(entry => {
+
+      if(entry._1.equals(filename)) {
+        if (entry._2.compareTo(yesterday) >= 0 && entry._2.compareTo(timestamp) <= 0) {
+          sumOfRecievedValues = (sumOfRecievedValues + entry._3).setScale(2, BigDecimal.RoundingMode.HALF_UP).toFloat
+          measurementAmount = measurementAmount + 1
+        }
       }
     })
 
-    receivedValues.remove(removableTimestamp)
-
-    receivedValues.values.forEach(degC => {
-      sumOfRecievedValues = sumOfRecievedValues + degC
-    })
-
-    val sizeOfRecievedValues = receivedValues.size
-
-    sumOfRecievedValues / sizeOfRecievedValues
+    (sumOfRecievedValues / measurementAmount).setScale(2, BigDecimal.RoundingMode.HALF_UP).toFloat
   }
 
   /**

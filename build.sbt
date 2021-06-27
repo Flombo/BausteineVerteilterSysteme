@@ -2,7 +2,7 @@ name := "BausteineVerteilterSysteme"
 
 version := "0.1"
 
-scalaVersion := "2.13.5"
+scalaVersion := "2.13.6"
 
 val AkkaVersion = "2.6.8"
 val AkkaHttpVersion = "10.2.4"

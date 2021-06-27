@@ -1,5 +1,6 @@
 import caseClasses.CSVFileMessage
 import akka.actor.Props
+import akka.routing.RoundRobinPool
 
 object Main extends App {
     val measurementAverageActor = Utils
@@ -10,9 +11,27 @@ object Main extends App {
       .createSystem("client.conf", "bausteineverteiltersysteme")
       .actorOf(Props(new CSVTextActor(measurementAverageActor)), name="csvtextactor")
 
-    val csvFileActor = Utils
+    val csvFileActorRouter = Utils
       .createSystem("client.conf", "bausteineverteiltersysteme")
-      .actorOf(Props(new CSVFileActor(csvTextActor)), name = "csvfileactor")
+      .actorOf(Props(new CSVFileActorRouter(csvTextActor)), name="csvfileactorroute")
 
-    csvFileActor ! CSVFileMessage(".\\src\\main\\resources\\jenaAusschnitt.csv")
+    csvFileActorRouter ! CSVFileMessage(".\\src\\main\\resources\\jena_tail.csv")
+    csvFileActorRouter ! CSVFileMessage(".\\src\\main\\resources\\jena_head.csv")
+
+}
+
+
+import akka.actor.{Actor, ActorRef, Props}
+import caseClasses.CSVFileMessage
+
+class CSVFileActorRouter(csvTextActor : ActorRef) extends Actor {
+
+    val router : ActorRef = context.actorOf(RoundRobinPool(2).props(Props(new CSVFileActor(csvTextActor))), name="router")
+
+
+    def receive: Receive = {
+        case csvFileMessage : CSVFileMessage=>
+            router ! csvFileMessage
+    }
+
 }

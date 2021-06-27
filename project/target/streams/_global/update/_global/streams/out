@@ -1,4 +1,4 @@
+[warn] scala-xml_2.12-1.0.6.jar no longer exists at C:\Users\flori\IdeaProjects\BausteineVerteilterSysteme\null\Coursier\cache\v1\https\repo1.maven.org\maven2\org\scala-lang\modules\scala-xml_2.12\1.0.6\scala-xml_2.12-1.0.6.jar
 [debug] not up to date. inChanged = false, force = false
-[debug] Updating ProjectRef(uri("file:/E:/Projekte/BausteineVerteilterSysteme/project/"), "bausteineverteiltersysteme-build")...
-[warn] Unrecognized repository Scala Plugin Bundled Repository, ignoring it
-[debug] Done updating ProjectRef(uri("file:/E:/Projekte/BausteineVerteilterSysteme/project/"), "bausteineverteiltersysteme-build")
+[debug] Updating ProjectRef(uri("file:/C:/Users/flori/IdeaProjects/BausteineVerteilterSysteme/project/"), "bausteineverteiltersysteme-build")...
+[debug] Done updating ProjectRef(uri("file:/C:/Users/flori/IdeaProjects/BausteineVerteilterSysteme/project/"), "bausteineverteiltersysteme-build")

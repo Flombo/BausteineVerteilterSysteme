@@ -1,5 +1,5 @@
 import akka.actor.{Actor, ActorRef}
-import caseClasses.{CSVFileMessage, CSVTextMessage}
+import caseClasses.{CSVFileActorFinishedMessage, CSVFileMessage, CSVTextMessage}
 
 import scala.io.{BufferedSource, Source}
 
@@ -32,10 +32,12 @@ class CSVFileActor (csvTextActor:  ActorRef) extends Actor{
 
     bufferedSource.getLines().foreach(row => {
       if(row.charAt(0) != '"')
-        csvTextActor ! CSVTextMessage(row)
+        csvTextActor ! CSVTextMessage(row, filename)
     })
 
     bufferedSource.close()
+
+    csvTextActor ! CSVFileActorFinishedMessage(filename)
   }
 
   /**

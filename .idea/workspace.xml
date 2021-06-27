@@ -10,19 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e349bc44-448d-4fb6-bf2a-20b5d9a39adb" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/jena_head.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/jena_tail.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/restInterface.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/RestCluster.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/project/target/config-classes/$00908e25367371dd6178$.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/project/target/config-classes/$00908e25367371dd6178.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/project/target/config-classes/$00908e25367371dd6178.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/target/streams/_global/dependencyPositions/_global/streams/update_cache_2.12/output_dsp" beforeDir="false" afterPath="$PROJECT_DIR$/project/target/streams/_global/dependencyPositions/_global/streams/update_cache_2.12/output_dsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/DBHandlerCluster.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/DBHandlerCluster.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/MeasurementAverageActor.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/MeasurementAverageActor.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/MeasurementAverageActor$$anonfun$receive$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/MeasurementAverageActor$$anonfun$receive$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/scala-2.13/classes/MeasurementAverageActor.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/scala-2.13/classes/MeasurementAverageActor.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,9 +93,13 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Dokumente/HFU/BausteineVerteilterSysteme/Aufgaben/Server.scala" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/scala/ActorMain.scala" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="Problems" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="restartRequiresConfirmation" value="false" />
@@ -128,7 +121,7 @@
       <recent name="E:\Projekte\BausteineVerteilterSysteme\target" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Main">
+  <component name="RunManager" selected="Application.RestCluster">
     <configuration name="DBWriterCluster (1)" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="DBHandlerCluster" />
       <module name="BausteineVerteilterSysteme" />
@@ -164,11 +157,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Main" />
-        <item itemvalue="Application.DBWriterCluster (1)" />
         <item itemvalue="Application.RestCluster" />
+        <item itemvalue="Application.DBWriterCluster (1)" />
         <item itemvalue="Application.ScalaJdbcConnection" />
         <item itemvalue="Application.HttpServerRouting" />
       </list>
@@ -225,6 +229,11 @@
       <workItem from="1623653732588" duration="1344000" />
       <workItem from="1623943900925" duration="6963000" />
       <workItem from="1624001259090" duration="857000" />
+      <workItem from="1624652744906" duration="863000" />
+      <workItem from="1624653652600" duration="1246000" />
+      <workItem from="1624694457826" duration="9672000" />
+      <workItem from="1624717050751" duration="11906000" />
+      <workItem from="1624794398829" duration="4167000" />
     </task>
     <task id="LOCAL-00001" summary="Aufgabenblatt1">
       <created>1620547613072</created>
@@ -261,11 +270,21 @@
       <option name="project" value="LOCAL" />
       <updated>1622902647556</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="BVS Abgabe4">
+      <created>1624798481305</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1624798481305</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.conf" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -286,6 +305,7 @@
     <MESSAGE value="BVS Aufgabe2 ActorCluster und REST-API für die Abfrage von gleitenden Mittelwerten" />
     <MESSAGE value="BVS Abgabe2 Verbesserungen" />
     <MESSAGE value="BVS Abgabe3" />
-    <option name="LAST_COMMIT_MESSAGE" value="BVS Abgabe3" />
+    <MESSAGE value="BVS Abgabe4" />
+    <option name="LAST_COMMIT_MESSAGE" value="BVS Abgabe4" />
   </component>
 </project>

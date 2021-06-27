@@ -1,5 +1,5 @@
 import akka.actor.{Actor, ActorRef}
-import caseClasses.{CSVTextMessage, MeasurementValueMessage}
+import caseClasses.{CSVFileActorFinishedMessage, CSVTextMessage, MeasurementValueMessage, StartMovingAverageCalculation}
 
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
@@ -16,7 +16,12 @@ class CSVTextActor(measurementAverageActor : ActorRef) extends Actor{
    */
   def receive(): Receive = {
     case message : CSVTextMessage =>
-      measurementAverageActor ! extractTimestampAndMeasurementValueFromText(message.text)
+      val measurementValueMessage : MeasurementValueMessage = extractTimestampAndMeasurementValueFromText(message.text, message.filename)
+      measurementAverageActor ! measurementValueMessage
+
+    case csvFileActorFinishedMessage : CSVFileActorFinishedMessage =>
+      measurementAverageActor ! StartMovingAverageCalculation(csvFileActorFinishedMessage.filename)
+
   }
 
   /**
@@ -26,11 +31,11 @@ class CSVTextActor(measurementAverageActor : ActorRef) extends Actor{
    * @param text : String
    * @return
    */
-  def extractTimestampAndMeasurementValueFromText(text : String): MeasurementValueMessage = {
+  def extractTimestampAndMeasurementValueFromText(text : String, filename : String): MeasurementValueMessage = {
       val allValuesSplitByComma : Array[String] = text.split(',')
       val timestamp : Timestamp = extractTimestampFromText(allValuesSplitByComma)
       val measurement : Float = allValuesSplitByComma(2).toFloat
-      MeasurementValueMessage(timestamp, measurement)
+      MeasurementValueMessage(filename, timestamp, measurement)
   }
 
   /**
@@ -47,7 +52,7 @@ class CSVTextActor(measurementAverageActor : ActorRef) extends Actor{
    */
   def extractTimestampFromText(allValuesSplitByComma : Array[String]) : Timestamp = {
     val dateTxt : String = allValuesSplitByComma(0)
-    val simpleDateFormat : SimpleDateFormat = new SimpleDateFormat("dd.mm.yyyy hh:mm:ss");
+    val simpleDateFormat : SimpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
     val date : Date = simpleDateFormat.parse(dateTxt)
     new Timestamp(date.getTime)
   }

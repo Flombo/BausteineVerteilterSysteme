@@ -6,7 +6,8 @@ import akka.http.scaladsl.server.Directives.{complete, get, pathPrefix, _}
 import akka.http.scaladsl.server.{PathMatchers, Route}
 import akka.pattern.ask
 import akka.util.Timeout
-import caseClasses.{AverageMeasurementResponseMessage, RequestAverageMeasurementMessage}
+import caseClasses.{AverageMeasurementResponseMessage, CountDBRowsMessage, CountDBRowsResponseMessage, RequestAverageMeasurementMessage}
+
 import java.sql.Timestamp
 import java.text.ParseException
 import java.time.LocalDateTime
@@ -52,6 +53,20 @@ class RestActor extends Actor with ActorLogging{
         case None =>
           log.info("No DBHandlerActor active...")
       }
+
+    case countDBRowsMessage: CountDBRowsMessage =>
+      dbHandlerActor match {
+
+        case Some(dbHandlerActor) =>
+
+          val future : Future[CountDBRowsResponseMessage] = (dbHandlerActor ? CountDBRowsMessage).mapTo[CountDBRowsResponseMessage]
+          val response = Await.result(future, timeout.duration)
+          sender ! response
+
+        case None =>
+          log.info("No DBHandlerActor active...")
+
+      }
   }
 }
 
@@ -91,42 +106,77 @@ object RestCluster extends App{
     implicit val executionContext : ExecutionContextExecutor = system.dispatcher
     implicit val timeout: Timeout = Timeout(6 seconds)
 
-    val route: Route =
-      get {
-        pathPrefix("when" / PathMatchers.RemainingPath) {
-          timestampString =>
-            try {
-              val localDateTimeOfParameter : LocalDateTime = extractLocalDateTimeFromGETParameter(timestampString.toString())
+    val route: Route = {
+      concat(
+        get {
+          pathPrefix("when" / PathMatchers.RemainingPath) {
+            timestampString =>
+              try {
+                val localDateTimeOfParameter : LocalDateTime = extractLocalDateTimeFromGETParameter(timestampString.toString())
 
-              val response: Future[AverageMeasurementResponseMessage] = (
-                restActor ? RequestAverageMeasurementMessage(
-                  Timestamp.valueOf(localDateTimeOfParameter)
-                )
-                ).mapTo[AverageMeasurementResponseMessage]
+                val response: Future[AverageMeasurementResponseMessage] = (
+                  restActor ? RequestAverageMeasurementMessage(
+                    Timestamp.valueOf(localDateTimeOfParameter)
+                  )
+                  ).mapTo[AverageMeasurementResponseMessage]
 
-              onComplete(response) {
-                averageMeasurementResponseMessage =>
+                onComplete(response) {
+                  averageMeasurementResponseMessage =>
 
-                  if (averageMeasurementResponseMessage.isSuccess) {
+                    if (averageMeasurementResponseMessage.isSuccess) {
 
-                    if (averageMeasurementResponseMessage.get.averageMeasurement.isDefined) {
-                      complete("{ when : " + Utils.toDateTime(localDateTimeOfParameter) + ", what : " + averageMeasurementResponseMessage.get.averageMeasurement.get + " }")
+                      if (averageMeasurementResponseMessage.get.averageMeasurement.isDefined) {
+                        complete("{ when : " + Utils.toDateTime(localDateTimeOfParameter) + ", what : " + averageMeasurementResponseMessage.get.averageMeasurement.get + " }")
+                      } else {
+                        complete("{ when : " + Utils.toDateTime(localDateTimeOfParameter) + " }")
+                      }
+
                     } else {
                       complete("{ when : " + Utils.toDateTime(localDateTimeOfParameter) + " }")
                     }
 
-                  } else {
-                    complete("{ when : " + Utils.toDateTime(localDateTimeOfParameter) + " }")
-                  }
+                }
 
+              } catch {
+                case exception: Exception =>
+                  complete("Error occured : " + exception.toString)
               }
+          }
+        },
 
-            } catch {
-              case exception: Exception =>
-                complete("Error occured : " + exception.toString)
-            }
+        get {
+          path("count") {
+              try {
+
+                val response: Future[CountDBRowsResponseMessage] = (
+                  restActor ? CountDBRowsMessage()
+                  ).mapTo[CountDBRowsResponseMessage]
+
+                onComplete(response) {
+                  countDBRowsResponseMessage =>
+
+                    if (countDBRowsResponseMessage.isSuccess) {
+
+                      if(countDBRowsResponseMessage.get.rowCount.isDefined) {
+                        complete("{ rows : " + countDBRowsResponseMessage.get.rowCount.get + " }")
+                      } else {
+                        complete("{}")
+                      }
+
+                    } else {
+                      complete("{}")
+                    }
+
+                }
+
+              } catch {
+                case exception: Exception =>
+                  complete("Error occured : " + exception.toString)
+              }
+          }
         }
-      }
+      )
+    }
     Http().newServerAt("localhost", 8080).bind(route)
   }
 
