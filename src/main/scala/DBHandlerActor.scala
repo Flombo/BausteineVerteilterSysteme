@@ -13,7 +13,6 @@ class DBHandlerActor extends Actor with ActorLogging{
   var insertPreparedStatement : Option[PreparedStatement] = None
   var selectPreparedStatement : Option[PreparedStatement] = None
   var countDBRowsPreparedStatement : Option[PreparedStatement] = None
-  var i = 0
 
   /**
    * preStart handler will be called before the actor will be started.
@@ -89,7 +88,7 @@ class DBHandlerActor extends Actor with ActorLogging{
     }
   }
 
-  def getRowCount() : Option[Int] = {
+  def getRowCount : Option[Int] = {
     var rowCount: Option[Int] = None
 
     try {
@@ -127,8 +126,6 @@ class DBHandlerActor extends Actor with ActorLogging{
       println("DBWriterActor : actor closed")
 
     case message : AverageMeasurementValueMessage =>
-      i = i + 1
-      println("DBWriterActor : actor received AverageMeasurementValueMessage: " + message + " iteration : " + i)
       writeIntoDB(message.timestamp, message.averageMeasurement)
 
     case RequestAverageMeasurementMessage(timestamp) =>
@@ -136,7 +133,7 @@ class DBHandlerActor extends Actor with ActorLogging{
       sender() ! AverageMeasurementResponseMessage(averageMeasurement)
 
     case CountDBRowsMessage =>
-      sender() ! CountDBRowsResponseMessage(getRowCount())
+      sender() ! CountDBRowsResponseMessage(getRowCount)
   }
 
   /**
